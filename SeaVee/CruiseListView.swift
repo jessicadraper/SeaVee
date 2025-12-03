@@ -11,69 +11,59 @@ import SwiftData
 struct CruiseListView: View {
     @Environment(\.modelContext) private var modelContext
     @Query private var cruises: [Cruise]
+    
+    @State private var isPresentingAdd = false // modal sheet
 
     var body: some View {
-        NavigationSplitView {
-            List {
-                ForEach(cruises) { cruise in
-                    NavigationLink(value: cruise) {
-                        VStack(alignment: .leading) {
-                            Text(cruise.line)
-                                .textCase(.uppercase)
-                                .font(.caption2)
-                                .fontWeight(.medium)
-                                .kerning(0.5)
-                            Text(cruise.title)
-                                .bold()
-                                .padding(.bottom, 3)
-                            HStack {
-                                Text("\(cruise.startDate.formatted(date: .abbreviated, time: .omitted)) – \(cruise.endDate.formatted(date: .abbreviated, time: .omitted))")
-                                    .font(.caption)
-                                Spacer()
-                                Text("\(cruise.itinerary.count) ports")
-                                    .foregroundStyle(.secondary)
-                                    .font(.caption)
-                            }
+        List {
+            ForEach(cruises) { cruise in
+                NavigationLink(value: cruise) {
+                    VStack(alignment: .leading) {
+                        Text(cruise.line)
+                            .textCase(.uppercase)
+                            .font(.caption2)
+                            .fontWeight(.medium)
+                            .kerning(0.5)
+                        Text(cruise.title)
+                            .bold()
+                            .padding(.bottom, 3)
+                        HStack {
+                            Text("\(cruise.startDate.formatted(date: .abbreviated, time: .omitted)) – \(cruise.endDate.formatted(date: .abbreviated, time: .omitted))")
+                                .font(.caption)
+                            Spacer()
+                            Text("\(cruise.itinerary.count) ports")
+                                .foregroundStyle(.secondary)
+                                .font(.caption)
                         }
                     }
                 }
-                .onDelete(perform: deleteItems)
             }
-            .navigationTitle("My Cruises")
-            .navigationDestination(for: Cruise.self) { cruise in
-                CruiseDetailView(cruise: cruise)
-            }
-            .scrollContentBackground(.hidden)
-            .background(Color.blue.opacity(0.07))
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    EditButton()
-                }
-                ToolbarItem {
-                    Button(action: addCruise) {
-                        Label("Add Cruise", systemImage: "plus")
-                    }
-                }
-            }
-        } detail: {
-            Text("Select an item")
+            .onDelete(perform: deleteItems)
         }
-    }
-
-    private func addCruise() {
-        withAnimation {
-            let sampleCruise = Cruise(
-                line: "Disney Cruise Line",
-                title: "Bahamas 3-Night Getaway",
-                startDate: Date(),
-                endDate: Calendar.current.date(byAdding: .day, value: 3, to: Date())!,
-                itinerary: [
-                    Date(): "Port Canaveral",
-                    Calendar.current.date(byAdding: .day, value: 1, to: Date())!: "Nassau",
-                    Calendar.current.date(byAdding: .day, value: 2, to: Date())!: "Castaway Cay"
-                ]
-            )
-            modelContext.insert(sampleCruise)
+        .navigationTitle("My Cruises")
+        .navigationDestination(for: Cruise.self) { cruise in
+            CruiseDetailView(cruise: cruise)
+        }
+        .scrollContentBackground(.hidden)
+        .background(Color.blue.opacity(0.07))
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    isPresentingAdd = true
+                } label: {
+                    Label("Add Cruise", systemImage: "plus")
+                }
+            }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                EditButton()
+            }
+        }
+        .fullScreenCover(isPresented: $isPresentingAdd) {
+            NavigationStack { // separate stack for add screen
+                CruiseInputView {
+                    isPresentingAdd = false // dismiss sheet when done
+                }
+            }
         }
     }
 

@@ -25,8 +25,10 @@ struct SeaVeeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            CruiseListView()
+            NavigationStack {
+                CruiseListView()
+                    .modelContainer(for: Cruise.self, inMemory: true)
+            }
         }
-        .modelContainer(sharedModelContainer)
     }
 }
