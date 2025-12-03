@@ -12,7 +12,7 @@ import SwiftData
 struct SeaVeeApp: App {
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
-            Item.self,
+            Cruise.self,
         ])
         let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
 
@@ -25,7 +25,7 @@ struct SeaVeeApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            CruiseListView()
         }
         .modelContainer(sharedModelContainer)
     }
