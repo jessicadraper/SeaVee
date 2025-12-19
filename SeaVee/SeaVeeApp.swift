@@ -11,13 +11,9 @@ import SwiftData
 @main
 struct SeaVeeApp: App {
     var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Cruise.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
-
+        let schema = Schema([Cruise.self, CruiseStop.self])
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            return try ModelContainer(for: schema)
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -27,8 +23,8 @@ struct SeaVeeApp: App {
         WindowGroup {
             NavigationStack {
                 CruiseListView()
-                    .modelContainer(for: Cruise.self, inMemory: true)
             }
+            .modelContainer(sharedModelContainer)
         }
     }
 }

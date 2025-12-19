@@ -10,14 +10,46 @@ import SwiftData
 
 struct CruiseListView: View {
     @Environment(\.modelContext) private var modelContext
-    @Query private var cruises: [Cruise]
+    @Query(sort: \Cruise.startDate, order: .forward) private var cruises: [Cruise]
     
     @State private var isPresentingAdd = false // modal sheet
+    
+    var cruiseCount: Int {
+        cruises.count
+    }
+
+    var portCount: Int {
+        cruises.reduce(0) { $0 + $1.itinerary.count }
+    }
+
 
     var body: some View {
         List {
-            ForEach(cruises) { cruise in
-                NavigationLink(value: cruise) {
+            HStack {
+                Spacer()
+                VStack(alignment: .center) {
+                    Text("Cruises")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(cruiseCount)")
+                        .font(.title2)
+                        .bold()
+                }
+                Spacer()
+                VStack(alignment: .center) {
+                    Text("Ports")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(portCount)")
+                        .font(.title2)
+                        .bold()
+                }
+                Spacer()
+            }
+            .listRowSeparator(.hidden)
+            
+            ForEach(cruises, id: \.id) { cruise in
+                NavigationLink(destination: CruiseDetailView(cruise: cruise)) {
                     VStack(alignment: .leading) {
                         Text(cruise.line)
                             .textCase(.uppercase)
@@ -41,9 +73,6 @@ struct CruiseListView: View {
             .onDelete(perform: deleteItems)
         }
         .navigationTitle("My Cruises")
-        .navigationDestination(for: Cruise.self) { cruise in
-            CruiseDetailView(cruise: cruise)
-        }
         .scrollContentBackground(.hidden)
         .background(Color.blue.opacity(0.07))
         .toolbar {
@@ -57,9 +86,17 @@ struct CruiseListView: View {
             ToolbarItem(placement: .navigationBarTrailing) {
                 EditButton()
             }
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    clearAllCruises()
+                } label: {
+                    Label("Clear", systemImage: "trash")
+                }
+                .tint(.red)
+            }
         }
         .fullScreenCover(isPresented: $isPresentingAdd) {
-            NavigationStack { // separate stack for add screen
+            NavigationStack {
                 CruiseInputView {
                     isPresentingAdd = false // dismiss sheet when done
                 }
@@ -71,6 +108,34 @@ struct CruiseListView: View {
         withAnimation {
             for index in offsets {
                 modelContext.delete(cruises[index])
+            }
+        }
+    }
+    
+    private func clearAllCruises() {
+        withAnimation {
+            do {
+                // 1. Fetch all CruiseStops
+                let stopDescriptor = FetchDescriptor<CruiseStop>()
+                let allStops = try modelContext.fetch(stopDescriptor)
+
+                // 2. Delete them
+                for stop in allStops {
+                    modelContext.delete(stop)
+                }
+
+                // 3. Fetch all Cruises
+                let cruiseDescriptor = FetchDescriptor<Cruise>()
+                let allCruises = try modelContext.fetch(cruiseDescriptor)
+
+                // 4. Delete them
+                for cruise in allCruises {
+                    modelContext.delete(cruise)
+                }
+
+                try modelContext.save()
+            } catch {
+                print("Failed clearing all cruises: \(error)")
             }
         }
     }

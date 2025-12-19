@@ -38,11 +38,11 @@ struct CruiseDetailView: View {
         // MARK: - Cruise Itinerary List
         List {
             Section("Cruise Itinerary") {
-                ForEach(sortedItinerary, id: \.0) { date, port in
+                ForEach(cruise.sortedStops, id: \.id) { stop in
                     HStack {
-                        Text(date, format: .dateTime.month().day())
+                        Text(stop.date, format: .dateTime.month().day())
                         Spacer()
-                        Text(port)
+                        Text(stop.port)
                     }
                 }
             }
@@ -53,24 +53,10 @@ struct CruiseDetailView: View {
         // MARK: - Map Area
         Text("Loading map...")
     }
-    
-    var sortedItinerary: [(Date, String)] {
-        cruise.itinerary.sorted { $0.key < $1.key }
-    }
 }
 
 #Preview {
-    let sampleCruise = Cruise(
-        line: "Disney Cruise Line",
-        title: "Bahamas 3-Night Getaway",
-        startDate: Date(),
-        endDate: Calendar.current.date(byAdding: .day, value: 3, to: Date())!,
-        itinerary: [
-            Date(): "Port Canaveral",
-            Calendar.current.date(byAdding: .day, value: 1, to: Date())!: "Nassau",
-            Calendar.current.date(byAdding: .day, value: 2, to: Date())!: "Castaway Cay"
-        ]
-    )
+    let sampleCruise = Cruise()
     
     CruiseDetailView(cruise: sampleCruise)
 }
