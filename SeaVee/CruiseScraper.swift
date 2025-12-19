@@ -49,7 +49,19 @@ struct DataRetrievalResponse: Decodable {
                     let index = Int(parts[1]) ?? 0
                     let field = parts[2]   // "date" or "text"
 
-                    let value = try container.decode(String.self, forKey: key)
+                    var value = try container.decode(String.self, forKey: key)
+                    
+                    if field == "text" {
+                        let prefixes = ["departing from ", "arriving in "]
+
+                        for prefix in prefixes {
+                            if value.lowercased().hasPrefix(prefix) {
+                                value = String(value.dropFirst(prefix.count))
+                                break // only remove the first matching prefix
+                            }
+                        }
+                        value = value.trimmingCharacters(in: .whitespacesAndNewlines)
+                    }
 
                     var entry = stops[index] ?? ("", "")
                     if field == "date" { entry.0 = value }

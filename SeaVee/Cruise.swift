@@ -13,6 +13,14 @@ final class CruiseStop {
     @Attribute(.unique) var id: UUID
     var date: Date
     var port: String
+    
+    // Persisted geocode fields
+   var latitude: Double?
+   var longitude: Double?
+   var confidence: Int?
+   var city: String?
+   var state: String?
+   var country: String?
     @Relationship var cruise: Cruise?
     
     init(id: UUID = UUID(), date: Date = Date(), port: String = "") {
@@ -25,15 +33,15 @@ final class CruiseStop {
 @Model
 final class Cruise {
     @Attribute(.unique) var id: UUID
-    var line: String
+    var ship: String
     var title: String
     var startDate: Date
     var endDate: Date
     @Relationship var itinerary: [CruiseStop]
     
-    init(id: UUID = UUID(), line: String = "", title: String = "", startDate: Date = Date(), endDate: Date = Date(), itinerary: [CruiseStop] = []) {
+    init(id: UUID = UUID(), ship: String = "", title: String = "", startDate: Date = Date(), endDate: Date = Date(), itinerary: [CruiseStop] = []) {
             self.id = id
-            self.line = line
+            self.ship = ship
             self.title = title
             self.startDate = startDate
             self.endDate = endDate

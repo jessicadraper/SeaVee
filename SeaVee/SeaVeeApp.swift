@@ -18,6 +18,11 @@ struct SeaVeeApp: App {
             fatalError("Could not create ModelContainer: \(error)")
         }
     }()
+    
+    init() {
+        print("APIFY TOKEN =", ProcessInfo.processInfo.environment["TOKEN"] ?? "missing")
+        print("GOOGLE API KEY =", ProcessInfo.processInfo.environment["GOOGLE_API_KEY"] ?? "missing")
+    }
 
     var body: some Scene {
         WindowGroup {

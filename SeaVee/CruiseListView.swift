@@ -17,6 +17,17 @@ struct CruiseListView: View {
     var cruiseCount: Int {
         cruises.count
     }
+    
+    var shipCount: Int {
+        Set(cruises.map { $0.ship }).count
+    }
+    
+    var uniqueCountries: [String] {
+        let allStops = cruises.flatMap { $0.itinerary }
+        let countries = allStops.compactMap { $0.country?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                                 .filter { !$0.isEmpty }
+        return Array(Set(countries)).sorted()
+    }
 
     var portCount: Int {
         cruises.reduce(0) { $0 + $1.itinerary.count }
@@ -28,6 +39,15 @@ struct CruiseListView: View {
             HStack {
                 Spacer()
                 VStack(alignment: .center) {
+                    Text("Ships")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    Text("\(shipCount)")
+                        .font(.title2)
+                        .bold()
+                }
+                Spacer()
+                VStack(alignment: .center) {
                     Text("Cruises")
                         .font(.caption)
                         .foregroundColor(.secondary)
@@ -37,10 +57,10 @@ struct CruiseListView: View {
                 }
                 Spacer()
                 VStack(alignment: .center) {
-                    Text("Ports")
+                    Text("Countries")
                         .font(.caption)
                         .foregroundColor(.secondary)
-                    Text("\(portCount)")
+                    Text("\(uniqueCountries.count)")
                         .font(.title2)
                         .bold()
                 }
@@ -51,7 +71,7 @@ struct CruiseListView: View {
             ForEach(cruises, id: \.id) { cruise in
                 NavigationLink(destination: CruiseDetailView(cruise: cruise)) {
                     VStack(alignment: .leading) {
-                        Text(cruise.line)
+                        Text(cruise.ship)
                             .textCase(.uppercase)
                             .font(.caption2)
                             .fontWeight(.medium)
