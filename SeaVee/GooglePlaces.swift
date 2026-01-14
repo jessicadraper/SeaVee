@@ -29,9 +29,9 @@ struct PlaceResponse: Decodable {
 }
 
 struct AddressComponents: Decodable {
-    let longText: String
-    let shortText: String
-    let types: [String]
+    let longText: String?
+    let shortText: String?
+    let types: [String]?
 }
 
 struct Location: Decodable {
