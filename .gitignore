@@ -7,6 +7,8 @@ DerivedData/
 *.xcuserstate
 *.xcscmblueprint
 *.xccheckout
+# Ignore Xcode scheme files (usually contain API keys or personal data)
+*.xcscheme
 
 # Build products
 build/
