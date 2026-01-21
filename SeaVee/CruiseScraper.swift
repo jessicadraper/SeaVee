@@ -71,11 +71,9 @@ struct DataRetrievalResponse: Decodable {
                     stops[index] = entry
                 }
             }
-            
             cruise_stops = stops
         }
 }
-
 
 // Need to parse unknown keys
 struct DynamicCodingKeys: CodingKey {

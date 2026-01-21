@@ -142,12 +142,6 @@ class Networking: ObservableObject {
                 
             }
             task.resume()
-            
-            // hard code dataset id temporarily
-//            let inner = DataRequestResponse.DataResponse(defaultDatasetId: "Jr8uKuI0iI4Q1SzEU")
-//            let response = DataRequestResponse(data: inner)
-
-//            completionHandler(response, nil)
         }
     
     // MARK: - Retrieve cruise data (apify)
@@ -179,10 +173,6 @@ class Networking: ObservableObject {
                     return
                 }
                 
-//                print("──────── RAW RESPONSE START ────────")
-//                print(String(decoding: data, as: UTF8.self))
-//                print("──────── RAW RESPONSE END ────────")
-                
                 // Return successful response
                 if let retrievalResponse = try? decoder.decode([DataRetrievalResponse].self, from: data) {
                     print("\(retrievalResponse.count) Results Returned")
@@ -207,11 +197,8 @@ class Networking: ObservableObject {
                 if let string = String(data: data, encoding: .utf8) {
                     print("Unknown Error Response: ", string)
                 }
-                
                 completionHandler(nil, .unknownError)
-                
             }
-            
             task.resume()
         }
     

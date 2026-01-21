@@ -173,15 +173,6 @@ struct CruiseListView: View {
     private func clearAllCruises() {
         withAnimation {
             do {
-//                // fetch all CruiseStops
-//                let stopDescriptor = FetchDescriptor<CruiseStop>()
-//                let allStops = try modelContext.fetch(stopDescriptor)
-//
-//                // 2. Delete them
-//                for stop in allStops {
-//                    modelContext.delete(stop)
-//                }
-//
                 // Fetch all Cruises
                 let cruiseDescriptor = FetchDescriptor<Cruise>()
                 let allCruises = try modelContext.fetch(cruiseDescriptor)

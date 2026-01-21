@@ -98,15 +98,6 @@ struct CruiseDetailView: View {
                         item.name = stop.city ?? stop.state ?? stop.port
                         
                         items.append(item)
-                        
-                        //                    do {
-                        //                        if let item = try await geocodePort(stop.port) {
-                        //                            items.append(item)
-                        //                        }
-                        //                    } catch {
-                        //                        let logger = Logger()
-                        //                        logger.error("Geocoding failed: \(error)")
-                        //                    }
                     }
                     
                     // Add port marker items
@@ -119,7 +110,6 @@ struct CruiseDetailView: View {
                     }
                 }
             }
-            
         }
     }
 }

@@ -14,7 +14,6 @@ struct CruiseInputView: View {
     // user input states
     @State private var startDate: Date = Date()
     @State private var endDate: Date = Date()
-//    @State private var ships: [String] = []
     @State private var cruises: [DataRetrievalResponse] = []
     @State private var shipsLoading: Bool = false
     @State private var shipSearchText = ""
@@ -71,9 +70,7 @@ struct CruiseInputView: View {
                     }
                 }
             }
-            
 
-            
             // MARK: - Import Button
             Section {
                 Button(action: importCruises) {
@@ -116,7 +113,6 @@ struct CruiseInputView: View {
         }
     }
 
-    
     private func importCruises() {
         isLoading = true;
         var n = 0;
@@ -174,9 +170,7 @@ struct CruiseInputView: View {
                             } catch {
                                 print("Failed to save cruise: \(error)")
                             }
-                            
                             isLoading = false
-                            
                         }
                     }
                 }
@@ -209,7 +203,6 @@ struct CruiseInputView: View {
                             return
                         }
                         
-                        print("Fetched details: \(placeResponse.addressComponents)")
                         cruiseStop.latitude = placeResponse.location.latitude
                         cruiseStop.longitude = placeResponse.location.longitude
                         
