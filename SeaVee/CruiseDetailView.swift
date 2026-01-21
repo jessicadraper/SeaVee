@@ -11,27 +11,17 @@ import MapKit
 import CoreLocation
 import OSLog
 
-//extension CLLocationCoordinate2D {
-//    static let parking = CLLocationCoordinate2D(latitude: 37.3318, longitude: -121.8863)
-//}
-
-//func geocodePort(_ name: String) async throws -> MKMapItem? {
-//    let geocoder = CLGeocoder()
-//    let placemarks = try await geocoder.geocodeAddressString(name)
-//
-//    guard let placemark = placemarks.first,
-//          let location = placemark.location else {
-//        return nil
-//    }
-//
-//    let mapItem = MKMapItem(placemark: MKPlacemark(placemark: placemark))
-//    return mapItem
-//}
-
 struct CruiseDetailView: View {
 
     @State private var portLocationMapItems: [MKMapItem] = []
     @State private var animatedCoords: [CLLocationCoordinate2D] = []
+    
+    var uniqueCountries: [String] {
+        let stops = cruise.itinerary
+        let countries = stops.compactMap { $0.country?.trimmingCharacters(in: .whitespacesAndNewlines) }
+                                 .filter { !$0.isEmpty }
+        return Array(Set(countries)).sorted()
+    }
     
     let cruise: Cruise
     
@@ -50,9 +40,11 @@ struct CruiseDetailView: View {
                     .bold()
                 HStack {
                     Text("\(cruise.startDate.formatted(date: .abbreviated, time: .omitted)) - \(cruise.endDate.formatted(date: .abbreviated, time: .omitted))")
+                        .font(.system(size: 14))
                     Spacer()
-                    Text("\(cruise.itinerary.count) stops")
+                    Text("\(cruise.itinerary.count) stops | \(uniqueCountries.count) countries")
                         .foregroundStyle(.secondary)
+                        .font(.system(size: 13))
                 }
                 .padding(.top, 2)
             }
@@ -67,13 +59,10 @@ struct CruiseDetailView: View {
                     ForEach(cruise.sortedStops, id: \.id) { stop in
                         HStack {
                             Text(stop.date, format: .dateTime.month().day())
-                            Spacer()
-                            //                        let city = stop.city ?? stop.state ?? ""
-                            //                        let country = stop.country ?? "–"
-                            
+                                .bold().textCase(.uppercase).font(.system(size: 14))
+                                .frame(minWidth: 60, alignment: .leading)
                             Text(stop.port)
-                            //                        Text("\(city), \(country)")
-                            //                            .font(.caption2)
+                                .font(.system(size: 16))
                         }
                     }
                 }

@@ -33,7 +33,7 @@ enum NetworkingError: Error, LocalizedError {
     }
 }
 
-// API Errors
+// Apify Errors
 struct ResponseError: Codable, Error {
     let error: ResponseErrorDetail
     
@@ -69,6 +69,7 @@ struct ApiResponseError: Codable {
 class Networking: ObservableObject {
     let session = URLSession(configuration: .default)
 
+    // Get environment variables for tokens/keys
     let token: String = {
         guard let value = ProcessInfo.processInfo.environment["TOKEN"] else { // added environment varibale to scheme
             fatalError("TOKEN missing")
@@ -83,8 +84,7 @@ class Networking: ObservableObject {
         return value
     }()
     
-    // MARK: - Request data
-    
+    // MARK: - Request cruise data (Apify)
     func requestData(
         ship_name: String? = nil,
         start_date: String,
@@ -133,9 +133,12 @@ class Networking: ObservableObject {
                     return
                 }
                 
+                // Otherwise return raw response
                 if let string = String(data: data, encoding: .utf8) {
-                    print("Response: ", string)
+                    print("Unknown Error Response: ", string)
                 }
+                
+                completionHandler(nil, .unknownError)
                 
             }
             task.resume()
@@ -147,8 +150,7 @@ class Networking: ObservableObject {
 //            completionHandler(response, nil)
         }
     
-    // MARK: - Retrieve data
-    
+    // MARK: - Retrieve cruise data (apify)
     func retrieveData(
         datasetId: String,
         completionHandler: @escaping (_ retrievalResponse: [DataRetrievalResponse]?, _ error: NetworkingError?) -> Void) {
@@ -177,9 +179,9 @@ class Networking: ObservableObject {
                     return
                 }
                 
-                print("──────── RAW RESPONSE START ────────")
-                print(String(decoding: data, as: UTF8.self))
-                print("──────── RAW RESPONSE END ────────")
+//                print("──────── RAW RESPONSE START ────────")
+//                print(String(decoding: data, as: UTF8.self))
+//                print("──────── RAW RESPONSE END ────────")
                 
                 // Return successful response
                 if let retrievalResponse = try? decoder.decode([DataRetrievalResponse].self, from: data) {
@@ -213,7 +215,7 @@ class Networking: ObservableObject {
             task.resume()
         }
     
-    // MARK: - Geocode data
+    // MARK: - Geocode data (Google Places API)
     func searchPlace(
         input: String,
         completionHandler: @escaping (_ autocompleteResponse: AutocompleteResponse?, _ error: NetworkingError?) -> Void) {
@@ -227,7 +229,6 @@ class Networking: ObservableObject {
             request.httpMethod = "POST"
             request.httpBody = try? JSONSerialization.data(withJSONObject: body, options: [])
             request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-//            request.setValue("addressComponents,location", forHTTPHeaderField: "X-Goog-FieldMask")
             
             let task = session.dataTask(with: request) { data, response, error in
                 let decoder = JSONDecoder()
@@ -255,6 +256,7 @@ class Networking: ObservableObject {
                     return
                 }
                 
+                // Otherwise show raw response
                 if let string = String(data: data, encoding: .utf8) {
                     print("Unknown Error Response: ", string)
                 }
@@ -301,6 +303,7 @@ class Networking: ObservableObject {
                     return
                 }
                 
+                // Otherwise show raw response
                 if let string = String(data: data, encoding: .utf8) {
                     print("Unknown Error Response: ", string)
                 }
@@ -310,64 +313,5 @@ class Networking: ObservableObject {
             }
             
             task.resume()
-        }
-    
-    func geocodeData(
-        query: String,
-        completionHandler: @escaping (_ geocodeResponse: GeocodeResponse?, _ error: NetworkingError?) -> Void) {
-            
-            let url = URL(string: "https://api.opencagedata.com/geocode/v1/json?q=\(query)&key=")!
-            var request = URLRequest(url: url)
-            request.httpMethod = "GET"
-            
-            let task = session.dataTask(with: request) { data, response, error in
-                let decoder = JSONDecoder()
-                
-                // Check for errors
-                if let error = error as? URLError {
-                    switch error.code {
-                    case .notConnectedToInternet, .networkConnectionLost, .timedOut:
-                        completionHandler(nil, .networkOffline)
-                    default:
-                        completionHandler(nil, NetworkingError.unknownError)
-                    }
-                    return
-                }
-                
-                // Check if data exists
-                guard let data = data else {
-                    completionHandler(nil, .unexpectedResponseFormat)
-                    return
-                }
-                
-                // Return successful response
-                if let geocodeResponse = try? decoder.decode(GeocodeResponse.self, from: data) {
-                    completionHandler(geocodeResponse, nil)
-                    return
-                }
-                
-                // Handle api errors
-                if let apiError = try? decoder.decode(ResponseError.self, from: data) {
-                    let code = apiError.error.code
-                    print("Error: \(apiError.error)")
-                    
-                    switch code {
-                    case 403:
-                        completionHandler(nil, .permissionDenied)
-                    default:
-                        completionHandler(nil, .apiError)
-                    }
-                    return
-                }
-                
-                if let string = String(data: data, encoding: .utf8) {
-                    print("Unknown Error Response: ", string)
-                }
-                
-                completionHandler(nil, .unknownError)
-                
-            }
-            
-            task.resume()
-        }
+    }
 }

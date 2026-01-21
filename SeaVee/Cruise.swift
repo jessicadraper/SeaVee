@@ -37,9 +37,15 @@ final class Cruise {
     var title: String
     var startDate: Date
     var endDate: Date
-    @Relationship var itinerary: [CruiseStop]
+    @Relationship(deleteRule: .cascade)
+    var itinerary: [CruiseStop]
     
-    init(id: UUID = UUID(), ship: String = "", title: String = "", startDate: Date = Date(), endDate: Date = Date(), itinerary: [CruiseStop] = []) {
+    init(id: UUID = UUID(),
+         ship: String = "",
+         title: String = "",
+         startDate: Date = Date(),
+         endDate: Date = Date(),
+         itinerary: [CruiseStop] = []) {
             self.id = id
             self.ship = ship
             self.title = title
