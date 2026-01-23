@@ -1,3 +1,5 @@
+<img src="/SeaVee/Assets.xcassets/AppIcon.appiconset/SeaVeeAsset.png" width="200px">
+
 # SeaVee
 An app that provides crew members on cruise ships the ability to track their itineraries and port destinations over the period of their work contract
 
@@ -17,4 +19,3 @@ An app that provides crew members on cruise ships the ability to track their iti
 - `GooglePlaces.swift`: Structs that define the responses from the Google Places API.
 - `Networking.swift`: Networking service for making network calls to the APIs and handling responses and errors.
 - `SeaVeeApp.swift`: Main entry point for the app where the model container is set and where API tokens are set using environment variables.
-
